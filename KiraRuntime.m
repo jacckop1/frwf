@@ -172,6 +172,29 @@ static Class KLFirstAvailableClass(NSArray<NSString *> *names) {
     return Nil;
 }
 
+// Retry class discovery without a self-referencing block. A recursive block
+// would retain itself under ARC and is rejected by clang with
+// -Warc-retain-cycles when Theos enables warnings as errors.
+static void KLAttemptRuntimeInstall(NSArray<NSString *> *settingsNames,
+                                    NSArray<NSString *> *cameraNames,
+                                    NSInteger attempt) {
+    Class settingsClass = KLFirstAvailableClass(settingsNames);
+    Class cameraClass = KLFirstAvailableClass(cameraNames);
+    BOOL settingsOK = KLHookClass(settingsClass, YES, NO);
+    BOOL cameraOK = KLHookClass(cameraClass, NO, YES);
+
+    if ((!settingsOK || !cameraOK) && attempt < 15) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)),
+                       dispatch_get_main_queue(), ^{
+            KLAttemptRuntimeInstall(settingsNames, cameraNames, attempt + 1);
+        });
+        return;
+    }
+
+    KLLog(@"Installation finished: settings=%d camera=%d attempts=%ld",
+          settingsOK, cameraOK, (long)attempt);
+}
+
 @implementation KiraRuntime
 
 + (void)install {
@@ -194,21 +217,9 @@ static Class KLFirstAvailableClass(NSArray<NSString *> *names) {
             @"CameraViewController"
         ];
 
-        __block NSInteger attempts = 0;
-        __block void (^attemptInstall)(void);
-        attemptInstall = ^{
-            attempts += 1;
-            Class settingsClass = KLFirstAvailableClass(settingsNames);
-            Class cameraClass = KLFirstAvailableClass(cameraNames);
-            BOOL settingsOK = KLHookClass(settingsClass, YES, NO);
-            BOOL cameraOK = KLHookClass(cameraClass, NO, YES);
-            if ((!settingsOK || !cameraOK) && attempts < 15) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), attemptInstall);
-            } else {
-                KLLog(@"Installation finished: settings=%d camera=%d attempts=%ld", settingsOK, cameraOK, (long)attempts);
-            }
-        };
-        dispatch_async(dispatch_get_main_queue(), attemptInstall);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            KLAttemptRuntimeInstall(settingsNames, cameraNames, 1);
+        });
     });
 }
 

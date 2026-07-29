@@ -1,3 +1,9 @@
+## 1.1.4
+
+- Fixed the ARC compile failure in `KiraRuntime.m`: `capturing 'attemptInstall' strongly in this block is likely to lead to a retain cycle`.
+- Replaced the self-referencing retry block with the `KLAttemptRuntimeInstall` helper function.
+- Kept the same 15-attempt, one-second class-discovery retry behavior without suppressing compiler diagnostics.
+
 ## 1.1.3
 
 - Fixed GitHub Actions startup validation failure: `runner.temp` is not available in `jobs.<job_id>.env`.

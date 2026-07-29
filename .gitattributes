@@ -1,0 +1,4 @@
+# Keep CI scripts compatible with macOS/Linux runners even when edited on Windows.
+*.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf

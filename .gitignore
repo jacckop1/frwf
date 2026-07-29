@@ -1,0 +1,16 @@
+# Theos output
+.theos/
+.theos-toolchain/
+packages/
+dist/
+
+# macOS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Local configuration
+.theosrc

@@ -1,0 +1,8 @@
+Package: com.ikira.kiralocket
+Name: KiraLocket
+Version: 1.1.0
+Architecture: iphoneos-arm
+Description: Standalone clean-room local enhancement layer for Locket. No licensing, network calls, subscription bypass, or ad bypass.
+Maintainer: iKiraPlus
+Author: iKiraPlus
+Section: Tweaks

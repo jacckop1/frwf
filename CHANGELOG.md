@@ -1,3 +1,9 @@
+## 1.1.3
+
+- Fixed GitHub Actions startup validation failure: `runner.temp` is not available in `jobs.<job_id>.env`.
+- Set `THEOS` to the writable external path `/tmp/theos`, keeping Theos outside the repository source scan.
+- The cache and build steps continue to use the same `THEOS` environment variable.
+
 # Changelog
 
 ## 1.1.2

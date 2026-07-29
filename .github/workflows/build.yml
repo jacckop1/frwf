@@ -37,7 +37,9 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 30
     env:
-      THEOS: ${{ runner.temp }}/theos
+      # runner.* is unavailable while GitHub validates jobs.<job>.env.
+      # Use a fixed writable path outside the checked-out repository instead.
+      THEOS: /tmp/theos
 
     steps:
       - name: Checkout source
